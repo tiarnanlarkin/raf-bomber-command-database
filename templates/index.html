@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAF Bomber Command Research Database - AI Research System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #2c1810 100%);
+            color: #f4e4c1;
+            min-height: 100vh;
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Lancaster Bomber Silhouettes */
+        .lancaster-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        .lancaster-background.active {
+            opacity: 1;
+        }
+
+        /* Personnel Tab - Line formation */
+        .lancaster-personnel {
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 400'%3E%3Cg opacity='0.25'%3E%3Cpath d='M100 200 L200 190 L300 200 L400 190 L500 200 L600 190 L700 200 L800 190 L900 200' stroke='%23d4af37' stroke-width='2.5' fill='none'/%3E%3Cpath d='M150 250 L250 240 L350 250 L450 240 L550 250 L650 240 L750 250 L850 240' stroke='%23b8941f' stroke-width='2' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+            background-size: 800px 320px;
+        }
+
+        /* Aircraft Tab - Squadron formation */
+        .lancaster-aircraft {
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 600'%3E%3Cg opacity='0.25'%3E%3Cpath d='M200 150 L300 140 L400 150 L500 140 L600 150' stroke='%23d4af37' stroke-width='2.5' fill='none'/%3E%3Cpath d='M250 250 L350 240 L450 250 L550 240 L650 250' stroke='%23d4af37' stroke-width='2.5' fill='none'/%3E%3Cpath d='M300 350 L400 340 L500 350 L600 340 L700 350' stroke='%23d4af37' stroke-width='2.5' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+            background-position: 50% 40%;
+            background-repeat: no-repeat;
+            background-size: 900px 450px;
+        }
+
+        /* AI Tab - V Formation with data streams */
+        .lancaster-ai {
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cg opacity='0.3'%3E%3Cpath d='M600 200 L550 250 L500 300 L450 350 L400 400' stroke='%23d4af37' stroke-width='2.5' fill='none'/%3E%3Cpath d='M600 200 L650 250 L700 300 L750 350 L800 400' stroke='%23d4af37' stroke-width='2.5' fill='none'/%3E%3Cpath d='M600 200 L580 280 L560 360 L540 440' stroke='%23b8941f' stroke-width='2' fill='none'/%3E%3Cpath d='M600 200 L620 280 L640 360 L660 440' stroke='%23b8941f' stroke-width='2' fill='none'/%3E%3Cpath d='M600 200 L600 300 L600 400 L600 500' stroke='%23d4af37' stroke-width='3' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+            background-position: 50% 30%;
+            background-repeat: no-repeat;
+            background-size: 800px 533px;
+        }
+
+        /* Statistics Tab - Scattered formation */
+        .lancaster-stats {
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cg opacity='0.25'%3E%3Cpath d='M100 150 L150 130 L200 140 L250 150 L300 140' stroke='%23d4af37' stroke-width='2' fill='none'/%3E%3Cpath d='M500 300 L550 280 L600 290 L650 300' stroke='%23b8941f' stroke-width='2' fill='none'/%3E%3Cpath d='M800 450 L850 430 L900 440 L950 450' stroke='%238b6914' stroke-width='2' fill='none'/%3E%3Cpath d='M200 600 L250 580 L300 590' stroke='%23d4af37' stroke-width='2' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+            background-position: 0% 0%;
+            background-repeat: no-repeat;
+            background-size: 1000px 667px;
+        }
+
+        /* AI System Banner */
+        .ai-notice-banner {
+            background: linear-gradient(45deg, #1e3a8a 0%, #3b82f6 50%, #1e3a8a 100%);
+            color: #ffffff;
+            text-align: center;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 15px rgba(59, 130, 246, 0.3);
+            border-bottom: 2px solid #60a5fa;
+            position: relative;
+            z-index: 1000;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 2px 15px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 2px 25px rgba(59, 130, 246, 0.5); }
+        }
+
+        .ai-notice-banner::before {
+            content: "🤖";
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a0f08 0%, #3d2817 50%, #1a0f08 100%);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 3px solid #d4af37;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 100;
+        }
+
+        .raf-badge {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: radial-gradient(circle, #d4af37 0%, #b8941f  50%, #8b6914 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            border: 3px solid #f4e4c1;
+        }
+
+        .raf-star {
+            color: #1a0f08;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #d4af37;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #f4e4c1;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(26, 15, 8, 0.85);
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 0;
+            backdrop-filter: blur(8px);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: linear-gradient(135deg, #3d2817 0%, #2c1810 100%);
+            color: #f4e4c1;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-right: 1px solid #d4af37;
+            position: relative;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab:hover {
+            background: linear-gradient(135deg, #4a2c1a 0%, #3d2817 100%);
+            color: #d4af37;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+            color: #1a0f08;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content {
+            background: linear-gradient(135deg, rgba(26, 15, 8, 0.92) 0%, rgba(61, 40, 23, 0.92) 100%);
+            padding: 2rem;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #d4af37;
+            border-top: none;
+            min-height: 500px;
+            backdrop-filter: blur(8px);
+        }
+
+        .search-container {
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 70%;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 2px solid #d4af37;
+            border-radius: 25px;
+            background: rgba(244, 228, 193, 0.15);
+            color: #f4e4c1;
+            margin-right: 1rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .search-input::placeholder {
+            color: rgba(244, 228, 193, 0.7);
+        }
+
+        .search-button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+            color: #1a0f08;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-button:hover {
+            background: linear-gradient(135deg, #f4e4c1 0%, #d4af37 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .search-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            background: rgba(61, 40, 23, 0.4);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            min-height: 200px;
+            backdrop-filter: blur(8px);
+        }
+
+        .result-item {
+            background: rgba(26, 15, 8, 0.7);
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        .result-item h4 {
+            color: #d4af37;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .result-item p {
+            margin-bottom: 0.3rem;
+            line-height: 1.4;
+        }
+
+        /* AI Research Specific Styles */
+        .ai-query-container {
+            margin-bottom: 2rem;
+        }
+
+        .ai-query-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #f4e4c1;
+            resize: vertical;
+            font-family: 'Georgia', serif;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .ai-query-input::placeholder {
+            color: rgba(244, 228, 193, 0.7);
+        }
+
+        .ai-research-button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .ai-research-button:hover {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .ai-research-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-response {
+            background: rgba(30, 58, 138, 0.2);
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 1rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .ai-response h4 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .ai-response-content {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .ai-metadata {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #3b82f6;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .sample-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .sample-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(184, 148, 31, 0.3) 100%);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .sample-button:hover {
+            background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+            color: #1a0f08;
+        }
+
+        .ai-sample-button {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(30, 58, 138, 0.3) 100%);
+            color: #60a5fa;
+            border: 1px solid #3b82f6;
+        }
+
+        .ai-sample-button:hover {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+            color: #ffffff;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .memorial {
+            background: linear-gradient(135deg, rgba(26, 15, 8, 0.9) 0%, rgba(61, 40, 23, 0.9) 100%);
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+
+        .memorial h3 {
+            color: #d4af37;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .memorial p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #f4e4c1;
+            font-style: italic;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                width: 100%;
+                margin-bottom: 1rem;
+                margin-right: 0;
+            }
+            
+            .search-button, .ai-research-button {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+
+            .lancaster-background {
+                background-size: 400px 200px, 300px 150px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Lancaster Background Layers -->
+    <div id="lancaster-personnel" class="lancaster-background lancaster-personnel active"></div>
+    <div id="lancaster-aircraft" class="lancaster-background lancaster-aircraft"></div>
+    <div id="lancaster-ai" class="lancaster-background lancaster-ai"></div>
+    <div id="lancaster-stats" class="lancaster-background lancaster-stats"></div>
+
+    <!-- AI System Banner -->
+    <div class="ai-notice-banner">
+        ADVANCED AI RESEARCH SYSTEM ACTIVE - Multi-Agent Historical Analysis Now Available
+    </div>
+
+    <div class="header">
+        <div class="raf-badge">
+            <div class="raf-star">★</div>
+        </div>
+        <h1>RAF Bomber Command Research Database</h1>
+        <p class="subtitle">Preserving the Memory of Those Who Served - Enhanced with AI Research</p>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('personnel')">Personnel Search</button>
+            <button class="tab" onclick="showTab('aircraft')">Aircraft Database</button>
+            <button class="tab" onclick="showTab('ai')">AI Research</button>
+            <button class="tab" onclick="showTab('stats')">Statistics</button>
+        </div>
+
+        <div id="personnel" class="tab-content">
+            <h2>Personnel Search</h2>
+            <p>Search for RAF Bomber Command personnel by name or service number</p>
+            
+            <div class="sample-buttons">
+                <button class="sample-button" onclick="setSampleSearch('personnel', 'Patrick Cassidy')">Patrick Cassidy</button>
+                <button class="sample-button" onclick="setSampleSearch('personnel', '1802082')">Service #1802082</button>
+                <button class="sample-button" onclick="setSampleSearch('personnel', 'Guy Gibson')">Guy Gibson</button>
+                <button class="sample-button" onclick="setSampleSearch('personnel', '97 Squadron')">97 Squadron</button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="personnelSearch" class="search-input" placeholder="Enter name or service number (e.g., Patrick Cassidy, 1802082)">
+                <button class="search-button" onclick="searchPersonnel()">Search</button>
+            </div>
+            
+            <div id="personnelResults" class="results">
+                <p>Enter a search term to find personnel records...</p>
+            </div>
+        </div>
+
+        <div id="aircraft" class="tab-content hidden">
+            <h2>Aircraft Database</h2>
+            <p>Search for aircraft by serial number or type</p>
+            
+            <div class="sample-buttons">
+                <button class="sample-button" onclick="setSampleSearch('aircraft', 'JB174')">Lancaster JB174</button>
+                <button class="sample-button" onclick="setSampleSearch('aircraft', 'Lancaster')">Lancaster Bombers</button>
+                <button class="sample-button" onclick="setSampleSearch('aircraft', 'Halifax')">Halifax Bombers</button>
+                <button class="sample-button" onclick="setSampleSearch('aircraft', '97 Squadron')">97 Squadron Aircraft</button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="aircraftSearch" class="search-input" placeholder="Enter aircraft serial (e.g., JB174) or type (e.g., Lancaster)">
+                <button class="search-button" onclick="searchAircraft()">Search</button>
+            </div>
+            
+            <div id="aircraftResults" class="results">
+                <p>Enter a search term to find aircraft records...</p>
+            </div>
+        </div>
+
+        <div id="ai" class="tab-content hidden">
+            <h2>AI Research Assistant</h2>
+            <p>Advanced multi-agent AI system for comprehensive historical research and analysis</p>
+            
+            <div class="sample-buttons">
+                <button class="ai-sample-button" onclick="setSampleAIQuery('Tell me about Patrick Cassidy service number 1802082 and his role as Flight Engineer with 97 Squadron RAF Pathfinders')">Patrick Cassidy's Service</button>
+                <button class="ai-sample-button" onclick="setSampleAIQuery('What happened to Lancaster JB174 and its crew on the Hanover raid?')">Lancaster JB174 Mission</button>
+                <button class="ai-sample-button" onclick="setSampleAIQuery('Analyze the effectiveness of RAF Pathfinder operations and their impact on bombing accuracy')">Pathfinder Analysis</button>
+                <button class="ai-sample-button" onclick="setSampleAIQuery('Compare loss rates between different RAF squadrons during 1943-1944')">Squadron Comparisons</button>
+            </div>
+            
+            <div class="ai-query-container">
+                <textarea id="aiQuery" class="ai-query-input" placeholder="Ask a detailed question about RAF Bomber Command history, personnel, aircraft, or operations. The AI system will coordinate multiple specialist agents to provide comprehensive analysis..."></textarea>
+                <button class="ai-research-button" onclick="askAI()" id="aiResearchBtn">🤖 Research with AI</button>
+            </div>
+            
+            <div id="aiResults" class="results">
+                <p>Ask a question to get detailed multi-agent historical analysis...</p>
+            </div>
+        </div>
+
+        <div id="stats" class="tab-content hidden">
+            <h2>Database Statistics</h2>
+            <p>Overview of the RAF Bomber Command Research Database</p>
+            
+            <div class="results">
+                <div class="result-item">
+                    <h4>Database Overview</h4>
+                    <p><strong>Personnel Records:</strong> 125,012+ RAF Bomber Command personnel</p>
+                    <p><strong>Aircraft Records:</strong> 541+ aircraft with detailed specifications</p>
+                    <p><strong>Squadron Records:</strong> 496+ squadron histories and operations</p>
+                    <p><strong>Airfield Records:</strong> 56+ RAF airfields and bases</p>
+                </div>
+                
+                <div class="result-item">
+                    <h4>Featured Personnel</h4>
+                    <p><strong>Patrick Cassidy</strong> - Service #1802082, Flight Engineer, 97 Squadron RAF Pathfinders</p>
+                    <p><strong>Guy Gibson</strong> - Wing Commander, 617 Squadron "Dam Busters"</p>
+                    <p><strong>Leonard Cheshire</strong> - Group Captain, Victoria Cross recipient</p>
+                </div>
+                
+                <div class="result-item">
+                    <h4>AI Research System</h4>
+                    <p><strong>Multi-Agent Analysis:</strong> 5 specialist AI agents working in coordination</p>
+                    <p><strong>Research Capabilities:</strong> Personnel, Aircraft, Operations, Historical Context, Statistical Analysis</p>
+                    <p><strong>Response Quality:</strong> Comprehensive analysis with confidence scoring</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="memorial">
+        <h3>Lest We Forget</h3>
+        <p>In memory of the brave men and women of RAF Bomber Command who gave their lives in service to freedom. Their sacrifice shall never be forgotten.</p>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.add('hidden'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.remove('hidden');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Switch Lancaster background
+            const backgrounds = document.querySelectorAll('.lancaster-background');
+            backgrounds.forEach(bg => bg.classList.remove('active'));
+            document.getElementById('lancaster-' + tabName).classList.add('active');
+        }
+
+        // Sample search functionality
+        function setSampleSearch(type, query) {
+            if (type === 'personnel') {
+                document.getElementById('personnelSearch').value = query;
+            } else if (type === 'aircraft') {
+                document.getElementById('aircraftSearch').value = query;
+            }
+        }
+
+        function setSampleAIQuery(query) {
+            document.getElementById('aiQuery').value = query;
+        }
+
+        // Personnel search
+        async function searchPersonnel() {
+            const query = document.getElementById('personnelSearch').value.trim();
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('personnelResults');
+            resultsDiv.innerHTML = '<p>Searching personnel records...</p>';
+
+            try {
+                const response = await fetch('/api/personnel/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+                displayPersonnelResults(data.results || []);
+            } catch (error) {
+                resultsDiv.innerHTML = '<p>Error searching personnel records. Please try again.</p>';
+                console.error('Personnel search error:', error);
+            }
+        }
+
+        function displayPersonnelResults(results) {
+            const resultsDiv = document.getElementById('personnelResults');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p>No personnel records found matching your search.</p>';
+                return;
+            }
+
+            let html = '';
+            results.forEach(person => {
+                html += `
+                    <div class="result-item">
+                        <h4>${person.name}</h4>
+                        <p><strong>Service Number:</strong> ${person.service_number || 'Not recorded'}</p>
+                        <p><strong>Rank:</strong> ${person.rank || 'Not recorded'}</p>
+                        <p><strong>Role:</strong> ${person.role || 'Not recorded'}</p>
+                        <p><strong>Squadron:</strong> ${person.squadron || 'Not recorded'}</p>
+                        ${person.biography ? `<p><strong>Biography:</strong> ${person.biography}</p>` : ''}
+                        ${person.memorial_details ? `<p><strong>Memorial:</strong> ${person.memorial_details}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Aircraft search
+        async function searchAircraft() {
+            const query = document.getElementById('aircraftSearch').value.trim();
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('aircraftResults');
+            resultsDiv.innerHTML = '<p>Searching aircraft records...</p>';
+
+            try {
+                const response = await fetch('/api/aircraft/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+                displayAircraftResults(data.results || []);
+            } catch (error) {
+                resultsDiv.innerHTML = '<p>Error searching aircraft records. Please try again.</p>';
+                console.error('Aircraft search error:', error);
+            }
+        }
+
+        function displayAircraftResults(results) {
+            const resultsDiv = document.getElementById('aircraftResults');
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p>No aircraft records found matching your search.</p>';
+                return;
+            }
+
+            let html = '';
+            results.forEach(aircraft => {
+                html += `
+                    <div class="result-item">
+                        <h4>${aircraft.serial_number}</h4>
+                        <p><strong>Aircraft Type:</strong> ${aircraft.aircraft_type || 'Not recorded'}</p>
+                        <p><strong>Squadron:</strong> ${aircraft.squadron || 'Not recorded'}</p>
+                        ${aircraft.crew_details ? `<p><strong>Crew:</strong> ${aircraft.crew_details}</p>` : ''}
+                        ${aircraft.service_history ? `<p><strong>Service History:</strong> ${aircraft.service_history}</p>` : ''}
+                        ${aircraft.fate ? `<p><strong>Fate:</strong> ${aircraft.fate}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // AI Research functionality
+        async function askAI() {
+            const query = document.getElementById('aiQuery').value.trim();
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('aiResults');
+            const button = document.getElementById('aiResearchBtn');
+            
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<div class="loading"></div>Researching...';
+            resultsDiv.innerHTML = '<p>🤖 Multi-agent AI system is analyzing your query...</p>';
+
+            try {
+                const response = await fetch('http://localhost:5002/api/multi-agent/research', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+                displayAIResults(data);
+            } catch (error) {
+                resultsDiv.innerHTML = '<p>Error connecting to AI research system. Please try again.</p>';
+                console.error('AI research error:', error);
+            } finally {
+                // Reset button
+                button.disabled = false;
+                button.innerHTML = '🤖 Research with AI';
+            }
+        }
+
+        function displayAIResults(data) {
+            const resultsDiv = document.getElementById('aiResults');
+            
+            if (!data.response) {
+                resultsDiv.innerHTML = '<p>No response received from AI system. Please try again.</p>';
+                return;
+            }
+
+            const html = `
+                <div class="ai-response">
+                    <h4>🤖 Multi-Agent AI Research Results</h4>
+                    <div class="ai-response-content">${data.response}</div>
+                    <div class="ai-metadata">
+                        <p><strong>Agents Used:</strong> ${data.agents_used ? data.agents_used.join(', ') : 'Unknown'}</p>
+                        <p><strong>Confidence Score:</strong> ${data.confidence ? (data.confidence * 100).toFixed(1) + '%' : 'Unknown'}</p>
+                        <p><strong>Processing Time:</strong> ${data.processing_time ? data.processing_time.toFixed(2) + ' seconds' : 'Unknown'}</p>
+                        ${data.sources ? `<p><strong>Sources:</strong> ${data.sources.join(', ')}</p>` : ''}
+                    </div>
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                const activeTab = document.querySelector('.tab.active').textContent.trim();
+                if (activeTab === 'AI Research') {
+                    askAI();
+                }
+            } else if (event.key === 'Enter' && event.target.classList.contains('search-input')) {
+                if (event.target.id === 'personnelSearch') {
+                    searchPersonnel();
+                } else if (event.target.id === 'aircraftSearch') {
+                    searchAircraft();
+                }
+            }
+        });
+
+        // Initialize with personnel tab active
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('personnel');
+        });
+    </script>
+</body>
+</html>
+
