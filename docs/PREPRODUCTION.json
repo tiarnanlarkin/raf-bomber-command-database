@@ -1,0 +1,60 @@
+{
+  "project_name": "RAF Bomber Command Research Database",
+  "purpose": "Memorial and research platform preserving the memory of RAF personnel who served during World War II, specifically honoring Sergeant Patrick Cassidy and all RAF Bomber Command members",
+  "features": {
+    "mvp": [
+      "Personnel search with complete biographical records",
+      "Aircraft database with service histories",
+      "Statistics dashboard with comprehensive data",
+      "Professional RAF-themed memorial interface",
+      "Mobile responsive design with accessibility compliance",
+      "AI research assistant for historical analysis",
+      "Memorial dedication to Patrick Cassidy (Service #1802082)",
+      "Squadron information and operational history",
+      "Mission records and historical context",
+      "Health monitoring and error handling"
+    ],
+    "roadmap": [
+      "Database connection stability improvements",
+      "Full multi-agent AI system integration",
+      "Advanced search filters and export features",
+      "Enhanced memorial tribute sections",
+      "Production hosting migration",
+      "Performance optimization and caching",
+      "Additional personnel and aircraft records",
+      "Memorial wall features",
+      "User analytics and monitoring",
+      "SEO optimization for discoverability"
+    ]
+  },
+  "status": {
+    "phase": "pre-production",
+    "memorial_mission": "complete",
+    "core_functionality": "operational",
+    "deployment": {
+      "production": "https://58hpi8cw090y.manus.space",
+      "staging": "https://5001-i343t1qgv4goz6kz7lxl6-8e3b5818.manusvm.computer"
+    },
+    "database_records": {
+      "personnel": 10,
+      "aircraft": 4,
+      "squadrons": 4,
+      "missions": 4
+    }
+  },
+  "technical_stack": {
+    "backend": "Flask (Python 3.11)",
+    "frontend": "HTML/CSS/JavaScript SPA",
+    "database": "SQLite",
+    "ai_system": "Multi-agent with OpenAI integration",
+    "hosting": "Manus platform"
+  },
+  "memorial_focus": {
+    "primary_honoree": "Sergeant Patrick Cassidy",
+    "service_number": "1802082",
+    "squadron": "97 Squadron RAF Pathfinders",
+    "role": "Flight Engineer",
+    "memorial_location": "Runnymede Memorial Panel 119",
+    "dedication": "Their memory lives on - preserved in code, honored in history, accessible to all, never to be forgotten."
+  }
+}

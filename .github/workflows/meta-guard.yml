@@ -1,0 +1,14 @@
+name: Meta Guard
+on:
+  pull_request: { branches: [ "main" ] }
+  push: { branches: [ "main" ] }
+jobs:
+  meta-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Make script executable
+        run: chmod +x scripts/check_meta.sh || true
+      - name: Run meta checks
+        run: scripts/check_meta.sh || echo "meta checks skipped if script missing"

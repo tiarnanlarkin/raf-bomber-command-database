@@ -1,0 +1,23 @@
+{
+  "project_name": "RAF Bomber Command Research Database",
+  "owner_contact": "larkintiarnanbizz@gmail.com",
+  "runtime": {
+    "backend": "Flask (Python 3.11)",
+    "frontend": "HTML/CSS/JavaScript SPA"
+  },
+  "scripts": {
+    "build": "make build",
+    "test_all": "make test-all",
+    "lint": "make lint",
+    "type_check": "make type"
+  },
+  "links": {
+    "docs": "/docs/",
+    "ai_guide": "/_meta/AI_GUIDE.md",
+    "decisions": "/_meta/DECISIONS.md",
+    "tasks": "/_meta/TASKS.md",
+    "preproduction_human": "/docs/PREPRODUCTION.md",
+    "preproduction_machine": "/docs/PREPRODUCTION.json",
+    "prompts_ref": "/_meta/prompts/"
+  }
+}
