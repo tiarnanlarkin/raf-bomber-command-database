@@ -19,16 +19,11 @@ and all RAF Bomber Command personnel who served with courage and sacrifice.
 import os
 import sqlite3
 import json
-from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, send_file, render_template_string
-from flask_cors import CORS
+import csv
 import io
-from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from datetime import datetime, timedelta
+from flask import Flask, request, jsonify, send_file, render_template_string, Response
+from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, origins="*")
